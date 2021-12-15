@@ -15,9 +15,9 @@
 
 // Official Lexoffice Documentation: https://developers.lexoffice.io/docs/
 
-namespace LexOffice;
+namespace Conversional\LexOffice;
 
-class lexoffice_client {
+class LexOfficeClient {
     protected $api_key = '';
     protected $api_endpoint = 'https://api.lexoffice.io';
     protected $callback = '';
@@ -25,8 +25,8 @@ class lexoffice_client {
     protected $countries;
 
     public function __construct($settings) {
-        if (!is_array($settings)) throw new lexoffice_exception('lexoffice-php-api: settings should be an array');
-        if (!array_key_exists('api_key', $settings)) throw new lexoffice_exception('lexoffice-php-api: no api_key is given');
+        if (!is_array($settings)) throw new LexofficeException('lexoffice-php-api: settings should be an array');
+        if (!array_key_exists('api_key', $settings)) throw new LexofficeException('lexoffice-php-api: no api_key is given');
 
         $this->api_key = $settings['api_key'];
         array_key_exists('callback', $settings) ? $this->callback = $settings['callback'] : $this->callback = false;
@@ -384,7 +384,7 @@ class lexoffice_client {
 
     protected function api_call($type, $resource, $uuid = '', $data = '', $params = '', $return_http_header = false, $repeatable = true) {
         // check api_key
-        if ($this->api_key === true || $this->api_key === false || $this->api_key === '') throw new lexoffice_exception('lexoffice-php-api: invalid API Key', ['api_key' => $this->api_key]);
+        if ($this->api_key === true || $this->api_key === false || $this->api_key === '') throw new LexofficeException('lexoffice-php-api: invalid API Key', ['api_key' => $this->api_key]);
 
         $ch = curl_init();
         $curl_url = $this->api_endpoint.'/'.$this->api_version.'/'.$resource.'/'.$uuid.$params;
@@ -444,7 +444,7 @@ class lexoffice_client {
                 'Accept: application/json',
             ]);
         } else {
-            throw new lexoffice_exception('lexoffice-php-api: unknown request type "'.$type.'" for api_call');
+            throw new LexofficeException('lexoffice-php-api: unknown request type "'.$type.'" for api_call');
         }
 
         curl_setopt($ch, CURLOPT_URL, $curl_url);
@@ -478,37 +478,37 @@ class lexoffice_client {
                 return true;
             }
         } elseif ($http_status == 400) {
-            throw new lexoffice_exception('lexoffice-php-api: Malformed syntax or a bad query', [
+            throw new LexofficeException('lexoffice-php-api: Malformed syntax or a bad query', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
                 'Response' => json_decode($result),
             ]);
         } elseif ($http_status == 401) {
-            throw new lexoffice_exception('lexoffice-php-api: invalid API Key', [
+            throw new LexofficeException('lexoffice-php-api: invalid API Key', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
                 'Response' => json_decode($result),
             ]);
         } elseif ($http_status == 402) {
-            throw new lexoffice_exception('lexoffice-php-api: action not possible due a lexoffice contract issue');
+            throw new LexofficeException('lexoffice-php-api: action not possible due a lexoffice contract issue');
         } elseif ($http_status == 403) {
-            throw new lexoffice_exception('lexoffice-php-api: Authenticated but insufficient scope or insufficient access rights in lexoffice', [
+            throw new LexofficeException('lexoffice-php-api: Authenticated but insufficient scope or insufficient access rights in lexoffice', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
                 'Response' => json_decode($result),
             ]);
         } elseif ($http_status == 404) {
-            throw new lexoffice_exception('lexoffice-php-api: Requested resource does no exist (anymore)', [
+            throw new LexofficeException('lexoffice-php-api: Requested resource does no exist (anymore)', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
                 'Response' => json_decode($result),
             ]);
         } elseif ($http_status == 405) {
-            throw new lexoffice_exception('lexoffice-php-api: Method not allowed on resource', [
+            throw new LexofficeException('lexoffice-php-api: Method not allowed on resource', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
@@ -519,21 +519,21 @@ class lexoffice_client {
             sleep(3);
             return $this->api_call($type, $resource, $uuid, $data, $params, $return_http_header, false);
         } elseif ($http_status == 429) {
-            throw new lexoffice_exception('lexoffice-php-api: Endpoint exceeds the limit of throttling. This request should be called again at a later time', [
+            throw new LexofficeException('lexoffice-php-api: Endpoint exceeds the limit of throttling. This request should be called again at a later time', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
                 'Response' => json_decode($result),
             ]);
         } elseif ($http_status == 500) {
-            throw new lexoffice_exception('lexoffice-php-api: Internal server error.', [
+            throw new LexofficeException('lexoffice-php-api: Internal server error.', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
                 'Response' => json_decode($result),
             ]);
         } elseif ($http_status == 503) {
-            throw new lexoffice_exception('lexoffice-php-api: API Service currently unavailable', [
+            throw new LexofficeException('lexoffice-php-api: API Service currently unavailable', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
@@ -541,7 +541,7 @@ class lexoffice_client {
             ]);
         } else {
             // all other codes https://developers.lexoffice.io/docs/#http-status-codes
-            throw new lexoffice_exception('lexoffice-php-api: error in api request - check details via $e->get_error()', [
+            throw new LexofficeException('lexoffice-php-api: error in api request - check details via $e->get_error()', [
                 'HTTP Status' => $http_status,
                 'Requested URI' => $curl_url,
                 'Requested Payload' => $data,
@@ -555,7 +555,7 @@ class lexoffice_client {
         if ($callback) {
             return $this->api_call('POST', 'event-subscriptions', '', ['eventType' => $event, 'callbackUrl' => $callback]);
         } else {
-            throw new lexoffice_exception('lexoffice-php-api: cannot create webhook, no callback given');
+            throw new LexofficeException('lexoffice-php-api: cannot create webhook, no callback given');
         }
     }
 
@@ -642,7 +642,7 @@ class lexoffice_client {
     }
 
     public function get_last_invoices($count) {
-        if ($count <= 0) throw new lexoffice_exception('lexoffice-php-api: positive invoice count needed');
+        if ($count <= 0) throw new LexofficeException('lexoffice-php-api: positive invoice count needed');
 
         if ($count <= 100) {
             $result = $this->api_call('GET', 'voucherlist', '', '', '?page=0&size='.$count.'&sort=voucherNumber,DESC&voucherType=invoice&voucherStatus=open,paid,paidoff,voided,transferred');
@@ -685,7 +685,7 @@ class lexoffice_client {
     public function get_invoice_pdf($uuid, $filename) {
         // check if invoice is a draft
         $invoice = $this->get_invoice($uuid);
-        if ($invoice->voucherStatus == 'draft') throw new lexoffice_exception('lexoffice-php-api: requested invoice is a draft. Cannot create/download pdf file. Check details via $e->get_error()', ['invoice_id' => $uuid]);
+        if ($invoice->voucherStatus == 'draft') throw new LexofficeException('lexoffice-php-api: requested invoice is a draft. Cannot create/download pdf file. Check details via $e->get_error()', ['invoice_id' => $uuid]);
 
         return $this->get_pdf('invoices', $uuid, $filename);
     }
@@ -795,7 +795,7 @@ class lexoffice_client {
     public function get_voucher_files($uuid, $filename_prefix): array {
         // must get voucher files before
         $voucher = $this->get_voucher($uuid);
-        if (!$voucher || !isset($voucher->files[0])) throw new lexoffice_exception('lexoffice-php-api: voucher has no files. Cannot download file. Check details via $e->get_error()', ['voucher_id' => $uuid]);
+        if (!$voucher || !isset($voucher->files[0])) throw new LexofficeException('lexoffice-php-api: voucher has no files. Cannot download file. Check details via $e->get_error()', ['voucher_id' => $uuid]);
 
         // iterate files
         $i = 1;
@@ -820,7 +820,7 @@ class lexoffice_client {
                     $extension = 'pdf';
                     break;
                 default:
-                    throw new lexoffice_exception('lexoffice-php-api: unknown mime/type "'.$request['header']['content_type'].'". Check details via $e->get_error()', ['voucher_id' => $uuid, 'response' => $request]);
+                    throw new LexofficeException('lexoffice-php-api: unknown mime/type "'.$request['header']['content_type'].'". Check details via $e->get_error()', ['voucher_id' => $uuid, 'response' => $request]);
             }
 
             $filename = $filename_prefix.'_'.$i.'.'.$extension;
@@ -878,22 +878,22 @@ class lexoffice_client {
                 if ($filter === false) $filter = 'false';
                 $filter_string.= $index.'='.$filter.'&';
             } elseif (($index == 'email' || $index == 'name') && $filter !== '') {
-                if (strlen($filter) < 3) throw new lexoffice_exception('lexoffice-php-api: search pattern must have least 3 characters');
+                if (strlen($filter) < 3) throw new LexofficeException('lexoffice-php-api: search pattern must have least 3 characters');
                 $filter_string.= $index.'='.$filter.'&';
             } elseif ($filter !== '') {
                 $filter_string.= $index.'='.$filter.'&';
             }
         }
 
-        if (!$filter_string) throw new lexoffice_exception('lexoffice-php-api: no valid filter for searching contacts');
+        if (!$filter_string) throw new LexofficeException('lexoffice-php-api: no valid filter for searching contacts');
         return $this->api_call('GET', 'contacts', '', '', '?'.substr($filter_string, 0, -1));
     }
 
     // todo check lifetime api key
 
     public function upload_file($file) {
-        if (!file_exists($file)) throw new lexoffice_exception('lexoffice-php-api: file does not exist', ['file' => $file]);
-        if (filesize($file) > 5*1024*1024) throw new lexoffice_exception('lexoffice-php-api: filesize to big', ['file' => $file, 'filesize' => filesize($file).' byte']);
+        if (!file_exists($file)) throw new LexofficeException('lexoffice-php-api: file does not exist', ['file' => $file]);
+        if (filesize($file) > 5*1024*1024) throw new LexofficeException('lexoffice-php-api: filesize to big', ['file' => $file, 'filesize' => filesize($file).' byte']);
         // use mimetype type from filename
         if (
             in_array(substr(strtolower($file), -4), ['.pdf', '.jpg', '.png']) ||
@@ -915,14 +915,14 @@ class lexoffice_client {
                 $dummy_title = 'dummy.jpg';
                 break;
             default:
-                throw new lexoffice_exception('lexoffice-php-api: invalid mime type', ['file' => $file]);
+                throw new LexofficeException('lexoffice-php-api: invalid mime type', ['file' => $file]);
         }
         return $this->api_call('POST', 'files', '', ['file' => new CURLFile($file, $mime_type, $dummy_title), 'type' => 'voucher']);
     }
 
     public function upload_voucher($uuid, $file) {
-        if (!file_exists($file)) throw new lexoffice_exception('lexoffice-php-api: file does not exist', ['file' => $file]);
-        if (filesize($file) > 5*1024*1024) throw new lexoffice_exception('lexoffice-php-api: filesize to big', ['file' => $file, 'filesize' => filesize($file).' byte']);
+        if (!file_exists($file)) throw new LexofficeException('lexoffice-php-api: file does not exist', ['file' => $file]);
+        if (filesize($file) > 5*1024*1024) throw new LexofficeException('lexoffice-php-api: filesize to big', ['file' => $file, 'filesize' => filesize($file).' byte']);
         // use mimetype type from filename
         if (
             in_array(substr(strtolower($file), -4), ['.pdf', '.jpg', '.png']) ||
@@ -944,7 +944,7 @@ class lexoffice_client {
                 $dummy_title = 'dummy.jpg';
                 break;
             default:
-                throw new lexoffice_exception('lexoffice-php-api: invalid mime type', ['file' => $file]);
+                throw new LexofficeException('lexoffice-php-api: invalid mime type', ['file' => $file]);
         }
         return $this->api_call('POST', 'vouchers', $uuid, ['file' => new CURLFile($file, $mime_type, $dummy_title), 'type' => 'voucher'], '/files');
     }
@@ -978,7 +978,7 @@ class lexoffice_client {
      * @param bool $b2b_business customer is a b2b customer
      * @param bool $physical_good a physical good will be selled
      * @return string
-     * @throws \lexoffice_exception
+     * @throws \LexofficeException
      */
     public function get_needed_voucher_booking_id(float $taxrate, string $country_code, int $date, bool $euopean_vatid, bool $b2b_business, bool $physical_good = true): string {
         // Weltweit, Kleinunternehmer
@@ -1005,7 +1005,7 @@ class lexoffice_client {
                 // check oss tax rate
                 $oss_taxrates = $this->get_taxrates($country_code, $date);
 
-                if (empty($oss_taxrates)) throw new lexoffice_exception('lexoffice-php-api: unknown OSS booking scenario, cannot decide correct taxrates', [
+                if (empty($oss_taxrates)) throw new LexofficeException('lexoffice-php-api: unknown OSS booking scenario, cannot decide correct taxrates', [
                     'taxrate' => $taxrate,
                     'country_code' => $country_code,
                     'european_vatid' => $euopean_vatid,
@@ -1013,7 +1013,7 @@ class lexoffice_client {
                     'physical_good' => $physical_good,
                 ]);
 
-                if (!$this->check_taxrate($taxrate, $country_code, $date)) throw new lexoffice_exception('lexoffice-php-api: invalid OSS taxrate for given country', [
+                if (!$this->check_taxrate($taxrate, $country_code, $date)) throw new LexofficeException('lexoffice-php-api: invalid OSS taxrate for given country', [
                     'taxrate' => $taxrate,
                     'country_code' => $country_code,
                     'date' => $date,
@@ -1030,7 +1030,7 @@ class lexoffice_client {
             if ($oss === 'origin') {
                 $oss_taxrates = $this->get_taxrates('DE', $date);
 
-                if (empty($oss_taxrates)) throw new lexoffice_exception('lexoffice-php-api: unknown OSS booking scenario, cannot decide correct taxrates', [
+                if (empty($oss_taxrates)) throw new LexofficeException('lexoffice-php-api: unknown OSS booking scenario, cannot decide correct taxrates', [
                     'taxrate' => $taxrate,
                     'country_code' => 'DE',
                     'european_vatid' => $euopean_vatid,
@@ -1038,7 +1038,7 @@ class lexoffice_client {
                     'physical_good' => $physical_good,
                 ]);
 
-                if (!$this->check_taxrate($taxrate, 'DE', $date)) throw new lexoffice_exception('lexoffice-php-api: invalid OSS taxrate for given country', [
+                if (!$this->check_taxrate($taxrate, 'DE', $date)) throw new LexofficeException('lexoffice-php-api: invalid OSS taxrate for given country', [
                     'taxrate' => $taxrate,
                     'country_code' => 'DE',
                     'date' => $date,
@@ -1051,7 +1051,7 @@ class lexoffice_client {
                 return $this->get_oss_voucher_category($country_code, $date, ($physical_good ? 1 : 2));
             }
 
-            throw new lexoffice_exception('lexoffice-php-api: unknown OSS configuration', [
+            throw new LexofficeException('lexoffice-php-api: unknown OSS configuration', [
                 'oss' => $oss,
             ]);
         }
@@ -1077,7 +1077,7 @@ class lexoffice_client {
             if ($taxrate > 0 && !$b2b_business) return '8f8664a1-fd86-11e1-a21f-0800200c9a66'; // Einnahmen
         }
 
-        throw new lexoffice_exception('lexoffice-php-api: unknown booking scenario, cannot decide correct booking category', [
+        throw new LexofficeException('lexoffice-php-api: unknown booking scenario, cannot decide correct booking category', [
             'taxrate' => $taxrate,
             'country_code' => $country_code,
             'date' => $date,
@@ -1166,7 +1166,7 @@ class lexoffice_client {
      *  bool    false           => no OSS needed, you can proceed without OSS stuff
      *  string  "origin"        => you have to use german taxrates
      *  string  "destination"   => you have to use OSS taxrates
-     * @throws \lexoffice_exception
+     * @throws \LexofficeException
      */
     public function is_oss_needed(string $country_code, int $date) {
         if ($date <= 1625090400) return false; // 01.07.2021
@@ -1175,7 +1175,7 @@ class lexoffice_client {
         if ($profile->smallBusiness) return false; // not used for taxless businesses
         if ($country_code === strtoupper('DE')) return false; // not for own country
         if (!$this->is_european_member($country_code, $date)) return false; // not for outside EU
-        if (empty($profile->distanceSalesPrinciple)) throw new lexoffice_exception('lexoffice-php-api: missing OSS configuration in lexoffice account'); // not configured in lexoffice
+        if (empty($profile->distanceSalesPrinciple)) throw new LexofficeException('lexoffice-php-api: missing OSS configuration in lexoffice account'); // not configured in lexoffice
         return strtolower($profile->distanceSalesPrinciple);
     }
 
@@ -1187,7 +1187,7 @@ class lexoffice_client {
      *  1 => Fernverkauf
      *  2 => Elektronische Dienstleistung
      * @return string lexoffice voucher booking category id
-     * @throws \lexoffice_exception
+     * @throws \LexofficeException
      */
     public function get_oss_voucher_category(string $country_code, int $date, int $booking_category = 1): string {
         $oss_type = $this->is_oss_needed($country_code, $date);
@@ -1195,16 +1195,16 @@ class lexoffice_client {
         if ($oss_type === 'origin') {
             if ($booking_category === 1) return '7c112b66-0565-479c-bc18-5845e080880a';
             if ($booking_category === 2) return 'd73b880f-c24a-41ea-a862-18d90e1c3d82';
-            throw new lexoffice_exception('lexoffice-php-api: invalid given booking_category', ['booking_category' => $booking_category]);
+            throw new LexofficeException('lexoffice-php-api: invalid given booking_category', ['booking_category' => $booking_category]);
         }
         // target country taxrates
         elseif ($oss_type === 'destination') {
             if ($booking_category === 1) return '4ebd965a-7126-416c-9d8c-a5c9366ee473';
             if ($booking_category === 2) return 'efa82f40-fd85-11e1-a21f-0800200c9a66';
-            throw new lexoffice_exception('lexoffice-php-api: invalid given booking_category', ['booking_category' => $booking_category]);
+            throw new LexofficeException('lexoffice-php-api: invalid given booking_category', ['booking_category' => $booking_category]);
         }
         else {
-            throw new lexoffice_exception('lexoffice-php-api: no possible OSS voucher category id');
+            throw new LexofficeException('lexoffice-php-api: no possible OSS voucher category id');
         }
     }
 
@@ -1216,17 +1216,5 @@ class lexoffice_client {
 
     public function create_credit_note($data, $finalized = false) {
         return $this->create_creditnote($data, $finalized);
-    }
-}
-
-class lexoffice_exception extends Exception {
-    private $custom_error;
-    public function __construct($message, $data = []) {
-        $this->custom_error = $data;
-        parent::__construct($message);
-    }
-
-    public function get_error() {
-        return $this->custom_error;
     }
 }
