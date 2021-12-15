@@ -11,7 +11,7 @@
     ],
     "autoload": {
       "psr-4": {
-        "Conversional\\LexOffice\\": ["src/"]
+        "Conversional\\LexOffice\\": ["./"]
       }
     }
   }
