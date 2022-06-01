@@ -1,14 +1,27 @@
 {
     "name": "conversional/lexoffice",
     "type": "library",
-    "description": "PHP Implementation of the LexOffice API.",
+    "description": "PHP Implementation of the LexOffice API. (Fork from https://github.com/Baebeca-Solutions/lexoffice-php-api)",
+    "license": "AGPL-3.0",
     "homepage": "https://www.conversion.al",
     "authors": [
       {
+        "name": "Baebeca Solutions GmbH",
+        "email": "support@baebeca.de"
+        "homepage": "https://www.baebeca.de",  
+        "role": "Copyright holder"
+      },
+      {
         "name": "Conversional GmbH",
-        "email": "support@conversional.de"
+        "email": "support@conversional.de",
+        "role": "Developer for this fork"
       }
     ],
+    "support": {
+        "email": "support@baebeca.de",
+        "wiki": "https://wiki.baebeca.de/index.php?title=Lexoffice-php-api",
+        "docs": "https://www.baebeca.de/softwareentwicklung/lexoffice-php-client/",
+    }    
     "autoload": {
       "psr-4": {
         "Conversional\\LexOffice\\": ["./"]
