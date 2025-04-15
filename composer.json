@@ -21,7 +21,7 @@
         "email": "support@baebeca.de",
         "wiki": "https://wiki.baebeca.de/index.php?title=Lexoffice-php-api",
         "docs": "https://www.baebeca.de/softwareentwicklung/lexoffice-php-client/"
-    }    
+    },
     "autoload": {
       "psr-4": {
         "Conversional\\LexOffice\\": ["./"]
